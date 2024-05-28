@@ -1,0 +1,24 @@
+##################################
+# Deployment
+##################################
+className: io.streamnative.data.feeds.realtime.coinbase.WebsocketFeedRouter
+tenant: feeds
+namespace: realtime
+name: coinbase-feed-router
+inputs:
+  - persistent://feeds/realtime/coinbase-livefeed
+userConfig:
+  TopicMap:
+    rfq_match: persistent://feeds/realtime/coinbase-rfq
+    ticker: persistent://feeds/realtime/coinbase-ticker
+    auction: persistent://feeds/realtime/coinbase-auction
+
+##################################
+# Processing
+##################################
+autoAck: true
+logTopic: persistent://feeds/realtime/coinbase-feed-router-log
+processingGuarantees: AT_LEAST_ONCE
+retainOrdering: true
+subName: router-sub
+cleanupSubscription: true
