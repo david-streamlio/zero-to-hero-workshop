@@ -1,14 +1,5 @@
 # Hands-On Lab #5: Running Flink
 
-Prerequisites
-------------
-
-- [Lab1](Lab1-guide.md)
-- [Lab2](Lab2-guide.md)
-- [Lab3](Lab3-guide.md)
-- [Lab4](Lab4-guide.md)
-
-
 Stream Processing Infrastructure
 --------------------------------------
 

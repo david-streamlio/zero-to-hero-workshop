@@ -1,10 +1,5 @@
 # Hands-On Lab #2: Real-time Data Stream Ingestion
 
-Prerequisites
-------------
-
-- [Lab1.md](Lab1-guide.md)
-
 
 ### 1️⃣ Start Ingesting Crypto Market Data
 

@@ -13,12 +13,9 @@ import org.slf4j.Logger;
 import java.util.Map;
 
 public class WebsocketFeedRouter implements Function<String, Void> {
-
     private Map<String, String> topicMap;
-
     private ObjectMapper objectMapper;
     private Logger LOG;
-
     @Override
     public Void process(String jsonString, Context ctx) throws Exception {
         String feedName = ctx.getCurrentRecord().getKey().orElse("UNKNOWN");
@@ -67,7 +64,6 @@ public class WebsocketFeedRouter implements Function<String, Void> {
     public void close() throws Exception {
         Function.super.close();
     }
-
     private ObjectMapper getObjectMapper() {
         if (this.objectMapper == null) {
             this.objectMapper = new ObjectMapper();

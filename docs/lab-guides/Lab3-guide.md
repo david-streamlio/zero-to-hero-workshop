@@ -1,11 +1,5 @@
 # Hands-On Lab #3: Event Based Processing
 
-Prerequisites
-------------
-
-- [Lab1.md](Lab1-guide.md)
-- [Lab2.md](Lab2-guide.md)
-
 
 Real-Time Processing with Apache Pulsar Functions
 --

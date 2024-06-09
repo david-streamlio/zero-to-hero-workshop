@@ -1,13 +1,5 @@
 # Hands-On Lab #4: Windowing Analytics
 
-Prerequisites
-------------
-
-- [Lab1](Lab1-guide.md)
-- [Lab2](Lab2-guide.md)
-- [Lab3](Lab3-guide.md)
-
-
 
 ### 1️⃣ Build the Python-Based Function
 First you need to build and deploy the Python-based Function,[stats.py](..%2F..%2Finfrastructure%2Fpulsar%2Ffunctions%2Fcoinbase-ticker-stats%2Fsrc%2Fstats.py)
