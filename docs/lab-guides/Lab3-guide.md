@@ -19,11 +19,11 @@ Therefore, our first Pulsar Function, [coinbase-websocket-feed-router](..%2F..%2
 is responsible for transforming these raw JSON strings into the appropriate schema type based on the channel it came 
 from, and routing them to different topics based on their contents.
 
-![coinbase-router.png](..%2Fimages%2Fcoinbase-router.png)
+![coinbase-router.png](..%2Fimages%2FLab3%2Fcoinbase-router.png)
 
 
 ```bash
-sh ./bin/pulsar/start-coinbase-feed-router.sh
+./bin/pulsar/start-coinbase-feed-router.sh
 ```
 
 This command starts the Crypto Market Data Feed routing function using the configuration details specified in the

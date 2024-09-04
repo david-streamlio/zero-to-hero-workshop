@@ -59,6 +59,7 @@ public class CoinbaseTopicProvider {
                 .build();
     }
 
+
     private String getSubName() {
         return String.format("flink-source-%s", uuid.toString().substring(0, 10));
     }

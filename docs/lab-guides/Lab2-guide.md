@@ -10,7 +10,7 @@ that allows us to easily ingest data from external sources into Apache Pulsar. T
 topic.
 
 ```bash
-sh ./bin/pulsar/start-coinbase-feed.sh
+./bin/pulsar/start-coinbase-feed.sh
 ```
 
 This command starts the connector using the configuration details specified in the

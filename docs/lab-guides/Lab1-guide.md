@@ -13,7 +13,7 @@ An Apache Pulsar cluster comprises three separate layers as shown in the followi
 of message brokers, a storage layer consisting of storage nodes known as "bookies", and a metadata layer, which in our 
 scenario will be a single Zookeeper node.
 
-![Pulsar-architecture.png](..%2Fimages%2FPulsar-architecture.png)
+![Pulsar-architecture.png](..%2Fimages%2FLab1%2FPulsar-architecture.png)
 
 You can verify that the deployment was successful using the following command, and seeing output similar to that
 shown here. This indicates that all three Pulsar-related containers are running.
@@ -33,11 +33,13 @@ Now that we have confirmed that all requisite components are running, you can be
 using its command-line tools. Let's start with the `pulsar-admin` tool, which as the name implies, allows us to perform
 administrative tasks, such as explore the available tenants, namespaces, and topics in the cluster.
 
-![Pulsar-logical-arch.png](..%2Fimages%2FPulsar-logical-arch.png)
+![Pulsar-logical-arch.png](..%2Fimages%2FLab1%2FPulsar-logical-arch.png)
 
 Running the following series of commands to create a new topic and confirm its existence:
 
 ```
+docker exec -it pulsar-broker /bin/bash
+
 ./bin/pulsar-admin topics create public/default/test-topic
 
 ./bin/pulsar-admin topics list  public/default
@@ -56,7 +58,7 @@ Subscribed to topic on pulsar/172.23.0.4:6650 -- consumer: 0
 
 Next, open a second shell on the broker and publish some data to the topic. 
 ```
-produce -n 3 -m "Zero to Hero" persistent://public/default/test-topic
+./bin/pulsar-client produce -n 3 -m "Zero to Hero" persistent://public/default/test-topic
 
 ...
 INFO  org.apache.pulsar.client.cli.PulsarClientTool - 3 messages successfully produced
@@ -77,6 +79,7 @@ We can then use the `pulsar-admin` tool again to display the statistics on the t
 
 ```
 ./bin/pulsar-admin topics stats persistent://public/default/test-topic
+
 {
   "msgRateIn" : 0.0,
   "msgThroughputIn" : 0.0,
