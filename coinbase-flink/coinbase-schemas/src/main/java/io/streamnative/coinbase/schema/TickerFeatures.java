@@ -1,11 +1,11 @@
 package io.streamnative.coinbase.schema;
 
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
 @Data
 @Builder
+@EqualsAndHashCode(callSuper = false)
 public class TickerFeatures {
     private String type;
     private long sequence;

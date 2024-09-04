@@ -14,7 +14,7 @@ streams. It will serve as our distributed streaming computation platform for thi
 command:
 
 ```bash
-sh ./bin/flink/start-flink.sh
+./bin/flink/start-flink.sh
 ```
 
 Next, you must wait until the Flink containers are all running.....
@@ -32,7 +32,7 @@ dca492aaa5ef   flink:latest   "/docker-entrypoint.…"   6 seconds ago   Up 6 se
 
 At this point, the Apache Flink Web UI is now available at http://localhost:8081
 
-![Flink-UI.png](..%2Fimages%2FFlink-UI.png)
+![Flink-UI.png](..%2Fimages%2FLab5%2FFlink-UI.png)
 
 ### Explore the Flink UI 
 

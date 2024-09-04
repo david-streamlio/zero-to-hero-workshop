@@ -28,7 +28,7 @@ updating: coinbase-ticker-stats/src/stats.py (deflated 71%)
 Next, you deploy it using the following command:
 
 ```bash
-sh ./bin/pulsar/start-ticker-stats.sh
+./bin/pulsar/start-ticker-stats.sh
 ```
 
 You can verify that the TickerStats Function is working by running the following command to consume messages from the

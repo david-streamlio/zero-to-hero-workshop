@@ -33,7 +33,7 @@ data needs to be aggregated over distinct, contiguous intervals.
 For example, if you specify a tumbling window with a size of 5 minutes, the current window will be evaluated and a new
 window will be started every five minutes.
 
-![tumbling-windows.svg](..%2Fimages%2Ftumbling-windows.svg)
+![tumbling-windows.svg](..%2Fimages%2FLab7%2Ftumbling-windows.svg)
 
 This query creates a view named RollingAveragePrice that calculates a rolling average price for each product within a 
 5-minute window from the ticker table. Let's go ahead and run the following command inside the Flink SQL client session.
@@ -126,7 +126,7 @@ the size of the windows is configured by the window size parameter. An additiona
 frequently a sliding window is started. Hence, sliding windows can be overlapping if the slide is smaller than the window
 size. In this case elements are assigned to multiple windows.
 
-![sliding-windows.svg](..%2Fimages%2Fsliding-windows.svg)
+![sliding-windows.svg](..%2Fimages%2FLab7%2Fsliding-windows.svg)
 
 For example, you could have windows of size 10 minutes that slides by 5 minutes. With this you get every 5 minutes a
 window that contains the events that arrived during the last 10 minutes.
