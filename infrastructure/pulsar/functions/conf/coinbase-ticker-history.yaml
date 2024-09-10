@@ -1,0 +1,22 @@
+##################################
+# Deployment
+##################################
+tenant: feeds
+namespace: realtime
+name: ticker-history
+className: io.streamnative.data.feeds.realtime.sink.CoinbaseTickerHistory
+inputs:
+  - persistent://feeds/realtime/coinbase-ticker
+userConfig:
+  jdbcUrl: "jdbc:mysql://my-sql:3306/coinbase?user=root&password=123456"
+  sql: "INSERT INTO price_history (product_id, ts, price) VALUES (?, ?, ?)"
+
+
+##################################
+# Processing
+##################################
+autoAck: true
+parallelism: 1
+retainOrdering: true
+subName: ticker-history-sub
+cleanupSubscription: true

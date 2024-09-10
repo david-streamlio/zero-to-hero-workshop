@@ -8,12 +8,12 @@ services:
       - MYSQL_ROOT_PASSWORD=123456
       - MYSQL_DATABASE=coinbase
     volumes:
-      - db-init:/docker-entrypoint-initdb.d
+      - coinbase-db-init:/docker-entrypoint-initdb.d
     ports:
       - "3306:3306"
 
 volumes:
-  db-init:
+  coinbase-db-init:
     driver: local # Define the driver and options under the volume name
     driver_opts:
       type: none
