@@ -2,6 +2,7 @@ target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+infrastructure/pulsar/functions/lib/*
 
 ### IntelliJ IDEA ###
 .idea/*
@@ -12,6 +13,7 @@ target/
 *.iws
 *.iml
 *.ipr
+coinbase-functions/.idea/
 
 ### Eclipse ###
 .apt_generated

@@ -88,14 +88,14 @@ services:
       - 6650:6650 # Pulsar Binary
       - 8080:8080
     volumes:
-      - functions:/etc/pulsar-functions
+      - coinbase-functions:/etc/pulsar-functions
     healthcheck:
       interval: 5s
       retries: 20
       test: curl --write-out 'HTTP %{http_code}' --fail --silent --output /dev/null http://localhost:8080/admin/v2/clusters/pulsar-cluster
 
 volumes:
-  functions:
+  coinbase-functions:
     driver: local # Define the driver and options under the volume name
     driver_opts:
       type: none

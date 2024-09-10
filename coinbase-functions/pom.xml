@@ -13,6 +13,7 @@
     <modules>
         <module>coinbase-live-feed</module>
         <module>coinbase-websocket-feed-router</module>
+        <module>coinbase-ticker-sink</module>
     </modules>
 
     <properties>
