@@ -65,10 +65,8 @@ public class TickerFeatureExtractionJob extends CoinbaseTopicProvider {
         DataStream<TickerFeatures> joinedStream = keyedTickerStatsStream
                 .connect(tickerBroadcastStream)
                 .process(new KeyedBroadcastProcessFunction<Long, TickerStats, Ticker, TickerFeatures>() {
-
                     private transient MapState<Long, Ticker> broadcastState;
                     private transient ValueState<TickerStats> keyedState;
-
                     @Override
                     public void open(Configuration parameters) throws Exception {
                         broadcastState = getRuntimeContext().getMapState(broadcastStateDescriptor);

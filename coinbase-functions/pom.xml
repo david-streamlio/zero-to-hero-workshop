@@ -8,9 +8,10 @@
     <artifactId>coinbase-functions</artifactId>
     <name>Coinbase Functions</name>
     <packaging>pom</packaging>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 
     <modules>
+        <module>coinbase-datatypes</module>
         <module>coinbase-live-feed</module>
         <module>coinbase-websocket-feed-router</module>
         <module>coinbase-ticker-sink</module>
@@ -23,7 +24,8 @@
         <junit.version>4.13.1</junit.version>
         <lombok.version>1.18.30</lombok.version>
         <mockito.version>4.0.0</mockito.version>
-        <pulsar.version>3.2.1.3</pulsar.version>
+        <pulsar.version>4.0.5.2</pulsar.version>
+        <streamnative.version>4.0.5.4</streamnative.version>
         <docker.repo>localhost:32000</docker.repo>
     </properties>
 
@@ -31,13 +33,13 @@
         <dependency>
             <groupId>io.streamnative</groupId>
             <artifactId>pulsar-functions-api</artifactId>
-            <version>${pulsar.version}</version>
+            <version>${streamnative.version}</version>
         </dependency>
 
         <dependency>
             <groupId>io.streamnative</groupId>
             <artifactId>pulsar-functions-local-runner-original</artifactId>
-            <version>${pulsar.version}</version>
+            <version>${streamnative.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>io.grpc</groupId>
@@ -90,43 +92,6 @@
                 </executions>
             </plugin>
 
-            <!--
-            <plugin>
-
-                <groupId>io.fabric8</groupId>
-                <artifactId>docker-maven-plugin</artifactId>
-                <version>0.43.0</version>
-                <configuration>
-                    <images>
-                        <image>
-                            <name>${docker.repo}/${project.artifactId}:${project.version}</name>
-                            <build>
-                                <contextDir>${project.basedir}/src/main/docker</contextDir>
-                                <assemblies>
-                                    <assembly>
-                                        <descriptorRef>artifact</descriptorRef>
-                                    </assembly>
-                                </assemblies>
-                                <tags>
-                                    <tag>latest</tag>
-                                </tags>
-                            </build>
-                        </image>
-                    </images>
-                    <registry>${docker.repo}</registry>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>docker:build</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>build</goal>
-                            <goal>push</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        -->
         </plugins>
     </build>
 
