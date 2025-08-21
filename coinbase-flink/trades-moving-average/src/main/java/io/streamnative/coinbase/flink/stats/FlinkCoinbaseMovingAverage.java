@@ -39,8 +39,12 @@ public class FlinkCoinbaseMovingAverage {
 
     public static void main(String[] args) throws Exception {
         // Read from environment variables (with defaults)
-        final String pulsarServiceUrl = System.getenv().getOrDefault("PULSAR_SERVICE_URL", "pulsar://192.168.0.200:6650");
-        final String pulsarAdminUrl = System.getenv().getOrDefault("PULSAR_ADMIN_URL", "http://192.168.0.200:8080");
+        final String pulsarServiceUrl = System.getenv().getOrDefault("PULSAR_SERVICE_URL",
+                "pulsar+ssl://pc-d7412b62.azure-usw3-production-7kcsh.test.azure.sn2.dev:6651");
+
+        final String pulsarAdminUrl = System.getenv().getOrDefault("PULSAR_ADMIN_URL",
+                "https://pc-d7412b62.azure-usw3-production-7kcsh.test.azure.sn2.dev");
+
         final String pulsarTopicIn = System.getenv().getOrDefault("PULSAR_INPUT_TOPIC", "persistent://feeds/realtime/coinbase-ticker");
         final String pulsarTopicOut = System.getenv().getOrDefault("PULSAR_OUTPUT_TOPIC", "persistent://feeds/realtime/moving-averages");
 

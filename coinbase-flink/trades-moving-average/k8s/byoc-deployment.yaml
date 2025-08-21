@@ -1,0 +1,59 @@
+apiVersion: compute.streamnative.io/v1alpha1
+kind: FlinkDeployment
+metadata:
+  name: o-noc4n-coinbase-moving-averages2
+  namespace: o-noc4n
+spec:
+  workspaceName: test-workspace  # Used this for now since it works
+  template:
+    syncingMode: PATCH # below are crd from ververica platform
+    deployment:
+      userMetadata:
+        name: o-noc4n-coinbase-moving-averages2
+        namespace: o-noc4n # the flink namespace
+        displayName: o-noc4n-coinbase-moving-averages2
+      spec:
+        state: RUNNING
+        deploymentTargetName: o-noc4n # the flink deployment target, will need create first on ui
+        maxJobCreationAttempts: 3
+        template:
+          metadata:
+            annotations:
+              flink.queryable-state.enabled: 'false'
+              flink.security.ssl.enabled: 'false'
+          spec:
+            artifact:
+              jarUri: function://feeds/realtime/moving-average-flink-job@v0.0.1
+              # mainArgs: --topic "public/default/flink-topic" --subName "test-flink-sub" --clusterName "wstest"
+              entryClass: io.streamnative.coinbase.flink.stats.FlinkCoinbaseMovingAverage
+              kind: JAR
+              flinkVersion: "1.19"
+            flinkConfiguration:
+              # execution.checkpointing.externalized-checkpoint-retention: RETAIN_ON_CANCELLATION
+              execution.checkpointing.interval: 60s
+              high-availability: kubernetes
+              state.backend: hashmap
+              state.checkpoints.dir: ""
+              state.savepoints.dir: ""
+              # === Ports (explicit, avoid random conflicts) ===
+              jobmanager.rpc.port: "6123"
+              taskmanager.rpc.port: "6122"
+              # Allow binding inside containers/K8s
+              jobmanager.bind-host: "0.0.0.0"
+              taskmanager.bind-host: "0.0.0.0"
+              # Force user code classloader priority
+              classloader.resolve-order: child-first
+            parallelism: 1
+            numberOfTaskManagers: 1
+            resources:
+              jobmanager:
+                cpu: "1"
+                memory: 1G
+              taskmanager:
+                cpu: "1"
+                memory: 2G
+            logging:
+              loggingProfile: default
+              log4jLoggers:
+                "": INFO
+                io.streamnative.coinbase.flink.stats: DEBUG
