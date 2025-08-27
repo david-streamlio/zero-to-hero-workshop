@@ -10,13 +10,14 @@ import static org.junit.Assert.assertNotNull;
 
 public class RfqMatchTests extends AbstractChannelTest {
 
-    private static final String EXPECTED =  "{\"maker_order_id\":\"maker\",\"taker_order_id\":\"taker\",\"side\":\"sell\",\"size\":12.345,\"price\":678.9,\"product_id\":\"Acme Rollerskates\",\"time\":\"2024-03-28T21:32:46.123000Z\",\"millis\":1711661566123}";
+    private static final String EXPECTED =  "{\"trade_id\":\"123456\",\"maker_order_id\":\"maker\",\"taker_order_id\":\"taker\",\"side\":\"sell\",\"size\":12.345,\"price\":678.9,\"product_id\":\"Acme Rollerskates\",\"time\":\"2024-03-28T21:32:46.123000Z\",\"millis\":1711661566123}";
 
-    private static final String AS_JSON = "{\"maker_order_id\":\"maker\",\"taker_order_id\":\"taker\",\"side\":\"sell\",\"size\":12.345,\"price\":678.9,\"product_id\":\"Acme Rollerskates\",\"time\":\"2024-03-28T21:32:46.123000Z\"}";
+    private static final String AS_JSON = "{\"trade_id\":\"123456\",\"maker_order_id\":\"maker\",\"taker_order_id\":\"taker\",\"side\":\"sell\",\"size\":12.345,\"price\":678.9,\"product_id\":\"Acme Rollerskates\",\"time\":\"2024-03-28T21:32:46.123000Z\"}";
 
     private static final RfqMatch MATCH = new RfqMatch();
 
     static {
+        MATCH.setTrade_id("123456");
         MATCH.setSize(12.345d);
         MATCH.setPrice(678.90d);
         MATCH.setSide("sell");

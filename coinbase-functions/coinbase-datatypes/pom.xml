@@ -15,7 +15,7 @@
     <name>Coinbase Functions :: Data Types</name>
 
     <properties>
-        <jackson.version>2.13.0</jackson.version>
+        <jackson.version>2.17.2</jackson.version>
     </properties>
 
     <dependencies>

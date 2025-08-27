@@ -2,7 +2,7 @@
 
 
 # Relative path to the source directory containing the files to be zipped
-source_dir="infrastructure/pulsar/functions/coinbase-ticker-stats"
+source_dir="deployments/docker/infrastructure/pulsar/functions/coinbase-ticker-stats"
 
 # Relative path to the destination directory where the zip file will be stored
 destination_dir="lib"

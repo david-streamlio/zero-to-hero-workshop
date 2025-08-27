@@ -1,7 +1,7 @@
 #!/bin/bash
 
 FUNCTIONS_DIR="coinbase-functions"
-INFRA_DIR="infrastructure/pulsar/functions/lib"
+INFRA_DIR="deployments/docker/infrastructure/pulsar/functions/lib"
 
 
 # Check if the directory exists
@@ -15,7 +15,7 @@ if [ -d "$INFRA_DIR" ]; then
 fi
 
 echo "Building the function artifacts"
-mvn clean install -f $FUNCTIONS_DIR/pom.xml
+mvn clean install -f $FUNCTIONS_DIR/pom.xml -Ddocker.skip=true
 
 values=("coinbase-live-feed" "coinbase-websocket-feed-router" "coinbase-ticker-sink")
 

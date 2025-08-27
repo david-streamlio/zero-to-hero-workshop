@@ -11,16 +11,18 @@
     <version>1.0.1</version>
 
     <modules>
-        <module>coinbase-datatypes</module>
         <module>coinbase-live-feed</module>
         <module>coinbase-websocket-feed-router</module>
         <module>coinbase-ticker-sink</module>
+        <module>coinbase-datatypes</module>
     </modules>
 
     <properties>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <jackson.version>2.17.2</jackson.version>
         <junit.version>4.13.1</junit.version>
         <lombok.version>1.18.30</lombok.version>
         <mockito.version>4.0.0</mockito.version>
