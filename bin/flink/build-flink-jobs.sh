@@ -1,7 +1,7 @@
 #!/bin/bash
 
 FLINK_DIR="coinbase-flink"
-INFRA_DIR="infrastructure/flink/jobs"
+INFRA_DIR="deployments/docker/infrastructure/flink/jobs"
 
 mvn clean install -f $FLINK_DIR/pom.xml
 

@@ -1,0 +1,24 @@
+services:
+  grafana:
+    image: grafana/grafana-oss
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    volumes:
+      - graphana-storage:/var/lib/grafana
+
+
+volumes:
+  graphana-storage:
+    driver: local # Define the driver and options under the volume name
+    driver_opts:
+      type: none
+      device: ./database
+      o: bind
+
+
+networks:
+  default:
+    name: real-time-crypto
+    external: true

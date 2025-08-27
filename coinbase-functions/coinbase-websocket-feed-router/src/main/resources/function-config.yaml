@@ -1,0 +1,16 @@
+tenant: feeds
+namespace: realtime
+name: coinbase-feed-router
+className: io.streamnative.data.feeds.realtime.coinbase.WebsocketFeedRouter
+runtime: JAVA
+jar: function://feeds/realtime/feed-router@v1
+inputs:
+  - persistent://feeds/realtime/coinbase-livefeed
+parallelism: 1
+subscriptionName: router-sub
+subscriptionPosition: Earliest
+cleanupSubscription: true
+# retainKeyOrdering: true
+autoAck: true
+# deadLetterTopic: persistent://feeds/realtime/coinbase-feed-router-DLQ
+logTopic: persistent://feeds/realtime/coinbase-feed-router-log

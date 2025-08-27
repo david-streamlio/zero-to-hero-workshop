@@ -14,10 +14,6 @@
     <artifactId>coinbase-websocket-feed-router</artifactId>
     <name>Coinbase Functions :: Router</name>
 
-    <properties>
-        <jackson.version>2.13.0</jackson.version>
-    </properties>
-
     <dependencies>
 
         <dependency>

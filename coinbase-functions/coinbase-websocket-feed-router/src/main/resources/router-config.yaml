@@ -2,18 +2,18 @@
 # Deployment
 ##################################
 className: io.streamnative.data.feeds.realtime.coinbase.WebsocketFeedRouter
-tenant: public
-namespace: default
+tenant: feeds
+namespace: realtime
 name: coinbase-feed-router
 inputs:
-  - persistent://public/default/coinbase-livefeed
+  - persistent://feeds/realtime/coinbase-livefeed
 userConfig:
 
 ##################################
 # Processing
 ##################################
 autoAck: true
-logTopic: persistent://public/default/coinbase-feed-router-log
+logTopic: persistent://feeds/realtime/coinbase-feed-router-log
 processingGuarantees: AT_LEAST_ONCE
 retainOrdering: true
 subName: router-sub

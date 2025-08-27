@@ -10,6 +10,7 @@ import org.apache.pulsar.functions.api.Function;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
+import java.util.HashMap;
 import java.util.Map;
 
 public class WebsocketFeedRouter implements Function<String, Void> {
@@ -54,10 +55,10 @@ public class WebsocketFeedRouter implements Function<String, Void> {
     public void initialize(Context ctx) throws Exception {
         Function.super.initialize(ctx);
         this.LOG = ctx.getLogger();
-        this.topicMap = (Map<String, String>) ctx.getUserConfigValue("TopicMap").get();
-        if (topicMap == null) {
-            throw new RuntimeException("Invalid configuration");
-        }
+        this.topicMap = new HashMap<String, String> ();
+        this.topicMap.put("rfq_match", "persistent://feeds/realtime/coinbase-rfq");
+        this.topicMap.put("ticker", "persistent://feeds/realtime/coinbase-ticker");
+        this.topicMap.put("auction", "persistent://feeds/realtime/coinbase-auction");
     }
 
     @Override

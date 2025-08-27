@@ -5,6 +5,7 @@ import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.connector.source.Source;
 import org.apache.flink.api.connector.sink.Sink;
+import org.apache.flink.connector.pulsar.common.config.PulsarOptions;
 import org.apache.flink.connector.pulsar.source.PulsarSource;
 import org.apache.flink.connector.pulsar.source.enumerator.cursor.StartCursor;
 import org.apache.flink.connector.pulsar.source.reader.deserializer.PulsarDeserializationSchema;
@@ -39,10 +40,18 @@ public class FlinkCoinbaseMovingAverage {
 
     public static void main(String[] args) throws Exception {
         // Read from environment variables (with defaults)
-        final String pulsarServiceUrl = System.getenv().getOrDefault("PULSAR_SERVICE_URL", "pulsar://192.168.0.200:6650");
-        final String pulsarAdminUrl = System.getenv().getOrDefault("PULSAR_ADMIN_URL", "http://192.168.0.200:8080");
+        final String pulsarServiceUrl = System.getenv().getOrDefault("PULSAR_SERVICE_URL",
+                "pulsar+ssl://pc-d7412b62.azure-usw3-production-7kcsh.test.azure.sn2.dev:6651");
+
+        final String pulsarAdminUrl = System.getenv().getOrDefault("PULSAR_ADMIN_URL",
+                "https://pc-d7412b62.azure-usw3-production-7kcsh.test.azure.sn2.dev");
+
         final String pulsarTopicIn = System.getenv().getOrDefault("PULSAR_INPUT_TOPIC", "persistent://feeds/realtime/coinbase-ticker");
         final String pulsarTopicOut = System.getenv().getOrDefault("PULSAR_OUTPUT_TOPIC", "persistent://feeds/realtime/moving-averages");
+
+        final String authPlugin = "org.apache.pulsar.client.impl.auth.AuthenticationToken";
+        final String jwtToken = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjIzMTE0Y2I5LTFkZmQtNTY5Yi04ZWNmLTQ5MWIwZTZlYTEyNCIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsidXJuOnNuOnB1bHNhcjpvLW5vYzRuOmZsaW5rZGVtbyJdLCJleHAiOjE3NTgzODQ4NTYsImh0dHBzOi8vc3RyZWFtbmF0aXZlLmlvL3Njb3BlIjpbImFjY2VzcyJdLCJodHRwczovL3N0cmVhbW5hdGl2ZS5pby91c2VybmFtZSI6ImRhdmlkLWFkbWluQG8tbm9jNG4uYXV0aC50ZXN0LmNsb3VkLmdjcC5zdHJlYW1uYXRpdmUuZGV2IiwiaWF0IjoxNzU1NzkyODU3LCJpc3MiOiJodHRwczovL3BjLWQ3NDEyYjYyLmF6dXJlLXVzdzMtcHJvZHVjdGlvbi03a2NzaC50ZXN0LmF6dXJlLnNuMi5kZXYvYXBpa2V5cy8iLCJqdGkiOiIxNjMxNjEyNDQ4MzQ0ZmY3YWFkODZlMzI3YWY2NGI4MiIsInBlcm1pc3Npb25zIjpbXSwic3ViIjoiSmVaU1dzSUNpMTVrOVc0UDFNUlRYS3IxbVVWUU56cW5AY2xpZW50cyJ9.boVUtfzNJIcX8iC1-HLHlnkBEsxkSapLuzt-pTCSnvuMZb124mUx0H9gZeSNEPZDPDuQYKZaF9FPr9B_ceqF4d3w91n8qG3wMjLiiw_yfi8zwxou38nMed0oV9Ctw6BTA90m0p1PJMFVt3ElSSBMvg2WxD8qoErNVIe8dgr8TKW9xBrbr67uz4HDfbysnqVIGd-qKKRAiJNpWO1YsHDEJ6JsDgtIv8zHUgZefC-YO_IA54AzdfRIs3kQbsCkrSSkgAnssclV4oP262TCZe8fsEJhhAod_4n_NJeDThzpmiFuhwq0SJU6oCQGqGil4lNhLFiA-BxHRXXStT5PaV6ELw";
+        final String authParams = String.format("{\"token\":\"%s\"}", jwtToken);
 
         System.out.printf("Using Pulsar service URL: %s%n", pulsarServiceUrl);
         System.out.printf("Using Pulsar input topic: %s%n", pulsarTopicIn);
@@ -66,6 +75,8 @@ public class FlinkCoinbaseMovingAverage {
         PulsarSource<Ticker> source = PulsarSource.builder()
                 .setServiceUrl(pulsarServiceUrl)
                 .setAdminUrl(pulsarAdminUrl)
+                .setConfig(PulsarOptions.PULSAR_AUTH_PLUGIN_CLASS_NAME, authPlugin)
+                .setConfig(PulsarOptions.PULSAR_AUTH_PARAMS, authParams)
                 .setStartCursor(StartCursor.earliest())
                 .setTopics(pulsarTopicIn)
                 .setDeserializationSchema(sourceSchema)
@@ -106,6 +117,8 @@ public class FlinkCoinbaseMovingAverage {
         PulsarSink<MovingAverage> sink = PulsarSink.builder()
                 .setServiceUrl(pulsarServiceUrl)
                 .setAdminUrl(pulsarAdminUrl)
+                .setConfig(PulsarOptions.PULSAR_AUTH_PLUGIN_CLASS_NAME, authPlugin)
+                .setConfig(PulsarOptions.PULSAR_AUTH_PARAMS, authParams)
                 .setTopics(pulsarTopicOut)
                 .setSerializationSchema(pulsarSerializationSchema)
                 .build();

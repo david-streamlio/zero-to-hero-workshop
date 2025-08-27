@@ -1,0 +1,83 @@
+services:
+
+  jobmanager:
+    image: flink:1.18-java11
+    platform: linux/amd64
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    command: jobmanager
+    container_name: "jobmanager"
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+    volumes:
+      - jobs:/jobs
+    deploy:
+      resources:
+        limits:
+          cpus: '4'
+          memory: 4G
+        reservations:
+          cpus: '2'
+          memory: 3G
+
+  taskmanager:
+    image: flink:1.18-java11
+    platform: linux/amd64
+    restart: unless-stopped
+    depends_on:
+      - jobmanager
+    command: taskmanager
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: '4'
+          memory: 5G
+        reservations:
+          cpus: '2'
+          memory: 4G
+    environment:
+      - FLINK_TM_HEAP=3G
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+        taskmanager.numberOfTaskSlots: 4
+        taskmanager.memory.process.size: 3800m
+
+  sql-client:
+    build:
+      context: .
+      dockerfile: sql-client/Dockerfile
+    command: tail -f /dev/null
+    depends_on:
+      - jobmanager
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+        rest.address: jobmanager
+    volumes:
+      - ddls:/ddl
+
+volumes:
+  ddls:
+    driver: local # Define the driver and options under the volume name
+    driver_opts:
+      type: none
+      device: ./ddls
+      o: bind
+
+  jobs:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./jobs
+      o: bind
+
+networks:
+  default:
+    name: real-time-crypto
+    external: true
