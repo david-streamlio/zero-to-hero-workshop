@@ -12,6 +12,8 @@ configs:
     \"channels\": [\"ticker\", \"rfq_matches\", \"auctionfeed\"], 
     \"product_ids\": [ \"ETH-USD\", \"BTC-USD\", \"USDT-USD\", \"SOL-USD\", \"XRP-USD\"
     \ , \"DOGE-USD\", \"ADA-USD\", \"LTC-USD\" ] }"
+  maxReconnectAttempts: "10"
+  reconnectBaseDelayMs: "1000"
 
 ##################################
 # Processing
