@@ -2,6 +2,7 @@ package io.streamnative.coinbase.flink.aggregates.streams;
 
 import io.streamnative.coinbase.schema.Ticker;
 import io.streamnative.flink.utils.CoinbaseTopicProvider;
+import io.streamnative.flink.utils.ConfigurationProvider;
 import io.streamnative.flink.utils.FlinkUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
@@ -25,20 +26,17 @@ public class AvgPriceByProductId extends CoinbaseTopicProvider {
     }
 
     public static void main(String[] args) throws Exception {
-        final ParameterTool parameterTool = ParameterTool.fromArgs(args);
+        // Initialize configuration provider with uniform configuration support
+        ConfigurationProvider configProvider = new ConfigurationProvider(args);
+        
+        StreamExecutionEnvironment env = FlinkUtils.getEnvironment(configProvider.getParameterTool());
+        
+        // Get configuration with fallback precedence
+        Integer timeWindow = configProvider.getIntProperty("time.window", "TIME_WINDOW", 5);
+        String outputPath = configProvider.getProperty("output.path", "OUTPUT_PATH", "/tmp/flink-output");
 
-        if (parameterTool.getNumberOfParameters() < 4) {
-            System.err.println("Missing parameters!");
-            return;
-        }
-
-        StreamExecutionEnvironment env = FlinkUtils.getEnvironment(parameterTool);
-        String brokerServiceUrl = parameterTool.getRequired("broker-service-url");
-        String adminServiceUrl = parameterTool.getRequired("admin-service-url");
-        Integer timeWindow = Integer.parseInt(parameterTool.get("time-window"));
-        String outputPath = parameterTool.getRequired("output-path");
-
-        AvgPriceByProductId aggregate = new AvgPriceByProductId(brokerServiceUrl, adminServiceUrl);
+        // Use new configuration-based constructor
+        CoinbaseTopicProvider topicProvider = new CoinbaseTopicProvider(configProvider);
 
         final FileSink<String> sink = FileSink
                 .forRowFormat(new Path(outputPath),
@@ -51,7 +49,7 @@ public class AvgPriceByProductId extends CoinbaseTopicProvider {
                                 .build())
                 .build();
 
-        DataStream<Ticker> tickerDataStream = env.fromSource(aggregate.getTickerSource(),
+        DataStream<Ticker> tickerDataStream = env.fromSource(topicProvider.getTickerSource(),
                 WatermarkStrategy.<Ticker>forMonotonousTimestamps()
                         .withTimestampAssigner((Ticker t, long recordTimestamp) -> t.getMillis()),
                 "coinbase-ticker");

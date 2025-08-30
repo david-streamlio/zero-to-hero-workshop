@@ -42,6 +42,28 @@ spec:
         taskmanager.memory.managed.fraction: '0.0'
         taskmanager.numberOfTaskSlots: '1'
         web.cancel.enable: 'false'
+      environmentVariables:
+        - name: PULSAR_SERVICE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: pulsar-config
+              key: pulsar.service.url
+        - name: PULSAR_ADMIN_URL
+          valueFrom:
+            configMapKeyRef:
+              name: pulsar-config
+              key: pulsar.admin.url
+        - name: PULSAR_AUTH_PLUGIN
+          valueFrom:
+            configMapKeyRef:
+              name: pulsar-config
+              key: pulsar.auth.plugin
+        - name: PULSAR_AUTH_PARAMS
+          valueFrom:
+            secretKeyRef:
+              name: pulsar-auth-secret
+              key: auth-params
+              optional: true
       logging:
         log4jLoggers:
           '': INFO

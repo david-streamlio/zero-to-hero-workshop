@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pulsar-config
+  namespace: coinbase-demo
+data:
+  pulsar.properties: |
+    # Production Pulsar Configuration for Kubernetes Environment
+    
+    # Pulsar connection settings (production cluster)
+    pulsar.service.url=pulsar+ssl://pulsar-broker.pulsar.svc.cluster.local:6651
+    pulsar.admin.url=https://pulsar-broker.pulsar.svc.cluster.local:8443
+    
+    # Authentication (JWT Token - must be set via Secret)
+    pulsar.auth.plugin=org.apache.pulsar.client.impl.auth.AuthenticationToken
+    # pulsar.auth.params will be set via PULSAR_AUTH_PARAMS environment variable from Secret
+    
+    # Topic configuration (production tenant/namespace)
+    pulsar.tenant=production
+    pulsar.namespace=coinbase
+    pulsar.topics.ticker=coinbase-ticker
+    pulsar.topics.ticker.stats=coinbase-ticker-stats
+    pulsar.topics.ticker.features=ticker-features
+    pulsar.topics.moving.averages=moving-averages
+    pulsar.topics.auction=coinbase-auction
+    pulsar.topics.rfq=coinbase-rfq
+    
+    # Consumer/Producer configuration
+    pulsar.consumer.subscription.prefix=flink-prod-consumer
+    pulsar.consumer.name.prefix=flink-prod-consumer
+    pulsar.producer.name.prefix=flink-prod-producer
+    
+    # Job-specific parameters (production values)
+    time.window=10
+    output.path=/data/flink-output
+    
+    # Performance tuning for production
+    pulsar.client.connection.timeout.ms=30000
+    pulsar.client.operation.timeout.ms=30000
+    pulsar.client.request.timeout.ms=60000

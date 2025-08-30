@@ -3,6 +3,7 @@ apiVersion: compute.functionmesh.io/v1alpha1
 kind: Source
 metadata:
   name: coinbase-live-feed
+  namespace: coinbase-demo
 spec:
   image: localhost:32000/coinbase-live-feed:latest
   className: io.streamnative.data.feeds.realtime.coinbase.WebSocketSource
@@ -71,10 +72,13 @@ spec:
 
 
 ---
+# Legacy ConfigMap - replaced by pulsar-config ConfigMap
+# This is kept for backward compatibility with existing Pulsar Function deployments
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: pulsar
+  namespace: coinbase-demo
 data:
   webServiceURL: http://192.168.0.200:8080
   brokerServiceURL: pulsar://192.168.0.200:6650

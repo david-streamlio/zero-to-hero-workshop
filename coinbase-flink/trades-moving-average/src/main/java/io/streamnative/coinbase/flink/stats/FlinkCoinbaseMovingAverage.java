@@ -30,6 +30,8 @@ import org.apache.flink.connector.pulsar.sink.writer.serializer.PulsarSerializat
 
 import io.streamnative.coinbase.flink.stats.serde.LocalDateTimeKryoSerializer;
 import io.streamnative.data.feeds.realtime.coinbase.channels.Ticker;
+import io.streamnative.flink.utils.ConfigurationProvider;
+import io.streamnative.flink.utils.PulsarConfig;
 
 import java.time.Instant;
 import java.util.Properties;
@@ -39,21 +41,17 @@ import java.time.LocalDateTime;
 public class FlinkCoinbaseMovingAverage {
 
     public static void main(String[] args) throws Exception {
-        // Read from environment variables (with defaults)
-        final String pulsarServiceUrl = System.getenv().getOrDefault("PULSAR_SERVICE_URL",
-                "pulsar+ssl://pc-d7412b62.azure-usw3-production-7kcsh.test.azure.sn2.dev:6651");
+        // Initialize uniform configuration provider
+        ConfigurationProvider configProvider = new ConfigurationProvider(args);
+        PulsarConfig pulsarConfig = configProvider.getPulsarConfig();
+        
+        // Get configurable topics with defaults
+        final String pulsarTopicIn = pulsarConfig.getTopicPrefix() + 
+            configProvider.getProperty("pulsar.topics.ticker", "PULSAR_INPUT_TOPIC", "coinbase-ticker");
+        final String pulsarTopicOut = pulsarConfig.getTopicPrefix() + 
+            configProvider.getProperty("pulsar.topics.moving.averages", "PULSAR_OUTPUT_TOPIC", "moving-averages");
 
-        final String pulsarAdminUrl = System.getenv().getOrDefault("PULSAR_ADMIN_URL",
-                "https://pc-d7412b62.azure-usw3-production-7kcsh.test.azure.sn2.dev");
-
-        final String pulsarTopicIn = System.getenv().getOrDefault("PULSAR_INPUT_TOPIC", "persistent://feeds/realtime/coinbase-ticker");
-        final String pulsarTopicOut = System.getenv().getOrDefault("PULSAR_OUTPUT_TOPIC", "persistent://feeds/realtime/moving-averages");
-
-        final String authPlugin = "org.apache.pulsar.client.impl.auth.AuthenticationToken";
-        final String jwtToken = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjIzMTE0Y2I5LTFkZmQtNTY5Yi04ZWNmLTQ5MWIwZTZlYTEyNCIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsidXJuOnNuOnB1bHNhcjpvLW5vYzRuOmZsaW5rZGVtbyJdLCJleHAiOjE3NTgzODQ4NTYsImh0dHBzOi8vc3RyZWFtbmF0aXZlLmlvL3Njb3BlIjpbImFjY2VzcyJdLCJodHRwczovL3N0cmVhbW5hdGl2ZS5pby91c2VybmFtZSI6ImRhdmlkLWFkbWluQG8tbm9jNG4uYXV0aC50ZXN0LmNsb3VkLmdjcC5zdHJlYW1uYXRpdmUuZGV2IiwiaWF0IjoxNzU1NzkyODU3LCJpc3MiOiJodHRwczovL3BjLWQ3NDEyYjYyLmF6dXJlLXVzdzMtcHJvZHVjdGlvbi03a2NzaC50ZXN0LmF6dXJlLnNuMi5kZXYvYXBpa2V5cy8iLCJqdGkiOiIxNjMxNjEyNDQ4MzQ0ZmY3YWFkODZlMzI3YWY2NGI4MiIsInBlcm1pc3Npb25zIjpbXSwic3ViIjoiSmVaU1dzSUNpMTVrOVc0UDFNUlRYS3IxbVVWUU56cW5AY2xpZW50cyJ9.boVUtfzNJIcX8iC1-HLHlnkBEsxkSapLuzt-pTCSnvuMZb124mUx0H9gZeSNEPZDPDuQYKZaF9FPr9B_ceqF4d3w91n8qG3wMjLiiw_yfi8zwxou38nMed0oV9Ctw6BTA90m0p1PJMFVt3ElSSBMvg2WxD8qoErNVIe8dgr8TKW9xBrbr67uz4HDfbysnqVIGd-qKKRAiJNpWO1YsHDEJ6JsDgtIv8zHUgZefC-YO_IA54AzdfRIs3kQbsCkrSSkgAnssclV4oP262TCZe8fsEJhhAod_4n_NJeDThzpmiFuhwq0SJU6oCQGqGil4lNhLFiA-BxHRXXStT5PaV6ELw";
-        final String authParams = String.format("{\"token\":\"%s\"}", jwtToken);
-
-        System.out.printf("Using Pulsar service URL: %s%n", pulsarServiceUrl);
+        System.out.printf("Using Pulsar service URL: %s%n", pulsarConfig.getServiceUrl());
         System.out.printf("Using Pulsar input topic: %s%n", pulsarTopicIn);
         System.out.printf("Using Pulsar output topic: %s%n", pulsarTopicOut);
 
@@ -71,17 +69,22 @@ public class FlinkCoinbaseMovingAverage {
                 new JsonDeserializationSchema<>(sourceTypeInfo)
         );
 
-        // Pulsar source
-        PulsarSource<Ticker> source = PulsarSource.builder()
-                .setServiceUrl(pulsarServiceUrl)
-                .setAdminUrl(pulsarAdminUrl)
-                .setConfig(PulsarOptions.PULSAR_AUTH_PLUGIN_CLASS_NAME, authPlugin)
-                .setConfig(PulsarOptions.PULSAR_AUTH_PARAMS, authParams)
+        // Pulsar source with unified configuration
+        PulsarSource.Builder<Ticker> sourceBuilder = PulsarSource.builder()
+                .setServiceUrl(pulsarConfig.getServiceUrl())
+                .setAdminUrl(pulsarConfig.getAdminUrl())
                 .setStartCursor(StartCursor.earliest())
                 .setTopics(pulsarTopicIn)
                 .setDeserializationSchema(sourceSchema)
-                .setSubscriptionName("flink-moving-average-sub")
-                .build();
+                .setSubscriptionName("flink-moving-average-sub");
+        
+        // Add authentication if configured
+        if (pulsarConfig.hasAuth()) {
+            sourceBuilder.setConfig(PulsarOptions.PULSAR_AUTH_PLUGIN_CLASS_NAME, pulsarConfig.getAuthPlugin())
+                         .setConfig(PulsarOptions.PULSAR_AUTH_PARAMS, pulsarConfig.getAuthParams());
+        }
+        
+        PulsarSource<Ticker> source = sourceBuilder.build();
 
         DataStream<Ticker> tickers = env
                 .fromSource(source, WatermarkStrategy
@@ -113,15 +116,20 @@ public class FlinkCoinbaseMovingAverage {
         PulsarSerializationSchema<MovingAverage> pulsarSerializationSchema =
                 new PulsarSerializationSchemaWrapper<>(jsonSerializationSchema);
 
-        // Pulsar sink
-        PulsarSink<MovingAverage> sink = PulsarSink.builder()
-                .setServiceUrl(pulsarServiceUrl)
-                .setAdminUrl(pulsarAdminUrl)
-                .setConfig(PulsarOptions.PULSAR_AUTH_PLUGIN_CLASS_NAME, authPlugin)
-                .setConfig(PulsarOptions.PULSAR_AUTH_PARAMS, authParams)
+        // Pulsar sink with unified configuration
+        PulsarSink.Builder<MovingAverage> sinkBuilder = PulsarSink.builder()
+                .setServiceUrl(pulsarConfig.getServiceUrl())
+                .setAdminUrl(pulsarConfig.getAdminUrl())
                 .setTopics(pulsarTopicOut)
-                .setSerializationSchema(pulsarSerializationSchema)
-                .build();
+                .setSerializationSchema(pulsarSerializationSchema);
+        
+        // Add authentication if configured
+        if (pulsarConfig.hasAuth()) {
+            sinkBuilder.setConfig(PulsarOptions.PULSAR_AUTH_PLUGIN_CLASS_NAME, pulsarConfig.getAuthPlugin())
+                       .setConfig(PulsarOptions.PULSAR_AUTH_PARAMS, pulsarConfig.getAuthParams());
+        }
+        
+        PulsarSink<MovingAverage> sink = sinkBuilder.build();
 
         averages.sinkTo(sink);
 
