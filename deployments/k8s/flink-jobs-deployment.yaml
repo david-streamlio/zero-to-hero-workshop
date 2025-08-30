@@ -1,0 +1,229 @@
+# Kubernetes deployment for Flink jobs using ConfigMap configuration
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flink-moving-average-job
+  namespace: coinbase-demo
+  labels:
+    app: flink-moving-average
+    component: flink-job
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flink-moving-average
+  template:
+    metadata:
+      labels:
+        app: flink-moving-average
+    spec:
+      containers:
+      - name: flink-moving-average
+        image: flink:1.19.0-scala_2.12-java17
+        command: ["/opt/flink/bin/flink"]
+        args: 
+          - "run"
+          - "-d"
+          - "--class"
+          - "io.streamnative.coinbase.flink.stats.FlinkCoinbaseMovingAverage"
+          - "/opt/flink/jobs/trades-moving-average.jar"
+        env:
+        # Configuration precedence: Environment variables override ConfigMap and files
+        - name: PULSAR_SERVICE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: pulsar-config
+              key: pulsar.service.url
+        - name: PULSAR_ADMIN_URL
+          valueFrom:
+            configMapKeyRef:
+              name: pulsar-config
+              key: pulsar.admin.url
+        - name: PULSAR_TENANT
+          valueFrom:
+            configMapKeyRef:
+              name: pulsar-config
+              key: pulsar.tenant
+        - name: PULSAR_NAMESPACE
+          valueFrom:
+            configMapKeyRef:
+              name: pulsar-config
+              key: pulsar.namespace
+        - name: TIME_WINDOW
+          valueFrom:
+            configMapKeyRef:
+              name: pulsar-config
+              key: time.window
+              optional: true
+        # Authentication (optional, from Secret)
+        - name: PULSAR_AUTH_PLUGIN
+          valueFrom:
+            secretKeyRef:
+              name: pulsar-auth-secret
+              key: auth-plugin
+              optional: true
+        - name: PULSAR_AUTH_PARAMS
+          valueFrom:
+            secretKeyRef:
+              name: pulsar-auth-secret
+              key: auth-params
+              optional: true
+        volumeMounts:
+        - name: flink-jobs
+          mountPath: /opt/flink/jobs
+          readOnly: true
+        - name: config-volume
+          mountPath: /etc/flink/config
+          readOnly: true
+        resources:
+          requests:
+            cpu: "0.5"
+            memory: "1Gi"
+          limits:
+            cpu: "2"
+            memory: "4Gi"
+      volumes:
+      - name: flink-jobs
+        configMap:
+          name: flink-jobs-config
+      - name: config-volume
+        configMap:
+          name: pulsar-config
+          items:
+          - key: pulsar.properties
+            path: pulsar.properties
+      restartPolicy: Always
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flink-aggregations-job
+  namespace: coinbase-demo
+  labels:
+    app: flink-aggregations
+    component: flink-job
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flink-aggregations
+  template:
+    metadata:
+      labels:
+        app: flink-aggregations
+    spec:
+      containers:
+      - name: flink-aggregations
+        image: flink:1.19.0-scala_2.12-java17
+        command: ["/opt/flink/bin/flink"]
+        args: 
+          - "run"
+          - "-d"
+          - "--class"
+          - "io.streamnative.coinbase.flink.aggregates.streams.AvgPriceByProductId"
+          - "/opt/flink/jobs/coinbase-aggregations.jar"
+        env:
+        # Environment variables from ConfigMap
+        - name: PULSAR_SERVICE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: pulsar-config
+              key: pulsar.service.url
+        - name: PULSAR_ADMIN_URL
+          valueFrom:
+            configMapKeyRef:
+              name: pulsar-config
+              key: pulsar.admin.url
+        - name: PULSAR_TENANT
+          valueFrom:
+            configMapKeyRef:
+              name: pulsar-config
+              key: pulsar.tenant
+        - name: PULSAR_NAMESPACE
+          valueFrom:
+            configMapKeyRef:
+              name: pulsar-config
+              key: pulsar.namespace
+        - name: TIME_WINDOW
+          valueFrom:
+            configMapKeyRef:
+              name: pulsar-config
+              key: time.window
+              optional: true
+        - name: OUTPUT_PATH
+          valueFrom:
+            configMapKeyRef:
+              name: pulsar-config
+              key: output.path
+              optional: true
+        # Authentication (optional, from Secret)
+        - name: PULSAR_AUTH_PLUGIN
+          valueFrom:
+            secretKeyRef:
+              name: pulsar-auth-secret
+              key: auth-plugin
+              optional: true
+        - name: PULSAR_AUTH_PARAMS
+          valueFrom:
+            secretKeyRef:
+              name: pulsar-auth-secret
+              key: auth-params
+              optional: true
+        volumeMounts:
+        - name: flink-jobs
+          mountPath: /opt/flink/jobs
+          readOnly: true
+        - name: config-volume
+          mountPath: /etc/flink/config
+          readOnly: true
+        - name: output-volume
+          mountPath: /tmp/flink-output
+        resources:
+          requests:
+            cpu: "0.5"
+            memory: "1Gi"
+          limits:
+            cpu: "2"
+            memory: "4Gi"
+      volumes:
+      - name: flink-jobs
+        configMap:
+          name: flink-jobs-config
+      - name: config-volume
+        configMap:
+          name: pulsar-config
+          items:
+          - key: pulsar.properties
+            path: pulsar.properties
+      - name: output-volume
+        emptyDir: {}
+      restartPolicy: Always
+
+---
+# ConfigMap for Flink job JARs (binary data)
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: flink-jobs-config
+  namespace: coinbase-demo
+binaryData:
+  # These would be populated with actual JAR files in base64 encoding
+  # In practice, you'd use an init container or external storage like S3/GCS
+  trades-moving-average.jar: ""
+  coinbase-aggregations.jar: ""
+  coinbase-flink-utils.jar: ""
+
+---
+# Secret for Pulsar authentication (optional)
+apiVersion: v1
+kind: Secret
+metadata:
+  name: pulsar-auth-secret
+  namespace: coinbase-demo
+type: Opaque
+data:
+  # Base64 encoded values - replace with actual values
+  auth-plugin: b3JnLmFwYWNoZS5wdWxzYXIuY2xpZW50LmltcGwuYXV0aC5BdXRoZW50aWNhdGlvblRva2Vu # AuthenticationToken
+  auth-params: eyJ0b2tlbiI6InlvdXItand0LXRva2VuLWhlcmUifQ== # {"token":"your-jwt-token-here"}

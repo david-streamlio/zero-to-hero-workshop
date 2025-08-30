@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pulsar-config
+  namespace: coinbase-demo
+  labels:
+    app: coinbase-pipeline
+    component: configuration
+data:
+  pulsar.properties: |
+    # Pulsar Configuration for Kubernetes Environment
+    
+    # Pulsar connection settings (replace with actual K8s service URLs)
+    pulsar.service.url=pulsar://pulsar-broker.pulsar:6650
+    pulsar.admin.url=http://pulsar-admin.pulsar:8080
+    
+    # Authentication (configure as needed for production)
+    # pulsar.auth.plugin=org.apache.pulsar.client.impl.auth.AuthenticationToken
+    # pulsar.auth.params={"token":"your-jwt-token-here"}
+    
+    # Tenant and namespace
+    pulsar.tenant=feeds
+    pulsar.namespace=realtime
+    
+    # Topic configuration
+    pulsar.topics.ticker=coinbase-ticker
+    pulsar.topics.ticker.stats=coinbase-ticker-stats  
+    pulsar.topics.ticker.features=ticker-features
+    pulsar.topics.rfq=coinbase-rfq
+    pulsar.topics.auction=coinbase-auction
+    pulsar.topics.moving.averages=moving-averages
+    
+    # Consumer configuration
+    pulsar.consumer.subscription.prefix=flink-k8s-consumer
+    pulsar.consumer.name.prefix=flink-k8s-consumer
+    
+    # Producer configuration  
+    pulsar.producer.name.prefix=flink-k8s-producer
+    
+    # Job-specific configuration
+    time.window=5
+    output.path=/opt/flink/output
