@@ -58,7 +58,7 @@
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-resolver-dns</artifactId>
-            <version>4.1.103.Final</version>
+            <version>4.1.135.Final</version>
         </dependency>
 
     </dependencies>
