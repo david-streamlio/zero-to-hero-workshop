@@ -15,7 +15,7 @@
     <name>Coinbase Functions :: Ticker Sink</name>
 
     <properties>
-        <mysql.version>8.0.33</mysql.version>
+        <mysql.version>8.4.0</mysql.version>
         <slf4j.version>2.0.13</slf4j.version>
     </properties>
 
@@ -24,12 +24,12 @@
         <dependency>
             <groupId>io.streamnative.data.feeds.realtime</groupId>
             <artifactId>coinbase-websocket-feed-router</artifactId>
-            <version>1.0.0</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
             <version>${mysql.version}</version>
         </dependency>
 
